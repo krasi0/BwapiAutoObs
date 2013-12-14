@@ -189,16 +189,27 @@ inline bool AutoObs::_parseUnits(std::set<BWAPI::Unit*> &units)
             BWAPI::Unit* targetUnit = NULL;
 
             // a small chance to anyway focus on the unit and NOT it's target
-            if (rand() % 10 >= 2) {
-                if ((*i)->getTarget()) {
+            if (rand() % 10 >= 1) {
+                if ((*i)->getTarget() 
+                    && (*i)->getTarget()->getPosition() != BWAPI::Positions::None
+                    && (*i)->getTarget()->getPosition() != BWAPI::Positions::Unknown
+                ) {
                     targetUnit = (*i)->getTarget(); 
-                } else if ((*i)->getOrderTarget()) {
+                } else if ((*i)->getOrderTarget()
+                    && (*i)->getOrderTarget()->getPosition() != BWAPI::Positions::None
+                    && (*i)->getOrderTarget()->getPosition() != BWAPI::Positions::Unknown
+                ) {
                     targetUnit = (*i)->getOrderTarget(); 
                 }
             }
 
             if (targetUnit) {
-                this->_reposition(this->_getPositionsCenter((*i)->getPosition(), targetUnit->getPosition()));
+                if (rand() % 10 >= 1) {
+                    this->_reposition(this->_getPositionsCenter((*i)->getPosition(), targetUnit->getPosition()));
+                } else { 
+                    // a small chance to focus on the target itself
+                    this->_reposition(targetUnit->getPosition());
+                }
             } else{
                 // otherwise move to the position of the unit
                 this->_reposition((*i)->getPosition());
@@ -246,6 +257,7 @@ void AutoObs::onGameUpdate()
 
     std::set<BWAPI::Unit*> units;
 
+    // first check for interesting enemy units
     BWAPI::Player* enemy = BWAPI::Broodwar->enemy();
 	if (enemy
 
@@ -262,10 +274,13 @@ void AutoObs::onGameUpdate()
         }
     }
 
-    //only consider isAttackFrame
-    if (! units.empty() && this->_parseUnits(units)) {
-        return;
+    // no appropriate enemy units to monitor, so monitor All units
+    if (BWAPI::Broodwar->self()) {
+        units = BWAPI::Broodwar->self()->getUnits();
 
+        if (! units.empty() && this->_parseUnits(units)) {
+            return;
+        }
     }
 }
 
