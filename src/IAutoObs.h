@@ -9,7 +9,7 @@ class IAutoObs
 
 private:
 
-    //singleton instance
+    // singleton instance
     static IAutoObs* _instance;
 
 
@@ -31,6 +31,10 @@ public:
         IAutoObs::_instance = instance;
     }
 
+    /**
+    * repositions the screen so that the coords of the given pos are at its center (px coords)
+    */
+    virtual void reposition(BWAPI::Position pos) = 0;
 
     /**
      * setter
@@ -50,13 +54,13 @@ public:
     virtual void onGameUpdate() = 0;
     
 
-	virtual void onUnitComplete(BWAPI::Unit* unit) = 0;
+	virtual void onUnitComplete(const BWAPI::Unit unit) = 0;
 
 
-	virtual void onUnitShow(BWAPI::Unit* unit) = 0;
+	virtual void onUnitShow(const BWAPI::Unit unit) = 0;
 
-	virtual void onUnitHide(BWAPI::Unit* unit) = 0;
+	virtual void onUnitHide(const BWAPI::Unit unit) = 0;
 
-	virtual void onRemoveUnit(BWAPI::Unit* unit) = 0;
+	virtual void onRemoveObject(const BWAPI::Unit unit) = 0;
 
 };
